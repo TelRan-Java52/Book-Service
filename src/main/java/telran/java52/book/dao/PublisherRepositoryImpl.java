@@ -23,18 +23,16 @@ public class PublisherRepositoryImpl implements PublisherRepository {
 	
 	@Override//don`t work
 	public List<String> findPublishersByAuthor(String authorName) {
-		 TypedQuery<Book> query = em.createQuery(
-	                "SELECT b FROM Book b WHERE b.author.name = :authorName", Book.class);
-	        query.setParameter("authorName", authorName);
-	        List<Book> books = query.getResultList();
+		TypedQuery<Book> query = em.createQuery(
+		        "SELECT b FROM Book b JOIN b.authors a WHERE a.name = :authorName", Book.class);
+		    query.setParameter("authorName", authorName);
+		   
+		    return 
+		    		query.getResultStream()
+		        .map(book -> book.getPublisher().getPublisherName())
+		        .distinct()
+		        .collect(Collectors.toList());
 
-	       
-	        List<String> publishers = books.stream()
-	                .map((Book book) -> book.getPublisher().getPublisherName())
-	                .distinct()
-	                .collect(Collectors.toList());
-
-	        return publishers;
 	}
 
 	@Override
