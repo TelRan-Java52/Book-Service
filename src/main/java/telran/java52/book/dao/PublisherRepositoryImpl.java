@@ -2,12 +2,17 @@ package telran.java52.book.dao;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
+import telran.java52.book.model.Book;
 import telran.java52.book.model.Publisher;
 
 @Repository
@@ -16,16 +21,29 @@ public class PublisherRepositoryImpl implements PublisherRepository {
     @PersistenceContext
 	EntityManager em;
 	
-	@Override
+	@Override//don`t work
 	public List<String> findPublishersByAuthor(String authorName) {
-		// TODO Auto-generated method stub
-		return null;
+		 TypedQuery<Book> query = em.createQuery(
+	                "SELECT b FROM Book b WHERE b.author.name = :authorName", Book.class);
+	        query.setParameter("authorName", authorName);
+	        List<Book> books = query.getResultList();
+
+	       
+	        List<String> publishers = books.stream()
+	                .map((Book book) -> book.getPublisher().getPublisherName())
+	                .distinct()
+	                .collect(Collectors.toList());
+
+	        return publishers;
 	}
 
 	@Override
 	public Stream<Publisher> findDistinctByBooksAuthorsName(String authorName) {
-		// TODO Auto-generated method stub
-		return null;
+		TypedQuery<Publisher> query = em.createQuery(
+                "SELECT DISTINCT b.publisher FROM Book b WHERE b.author.name = :authorName", Publisher.class);
+        query.setParameter("authorName", authorName);
+        List<Publisher> publishers = query.getResultList();
+        return publishers.stream();
 	}
 
 	@Override
@@ -33,10 +51,11 @@ public class PublisherRepositoryImpl implements PublisherRepository {
 		
 		return Optional.ofNullable(em.find(Publisher.class, publisher));
 	}
-
+//@Transactional
 	@Override
 	public Publisher save(Publisher publisher) {
-		em.persist(publisher);
+		em.persist(publisher);//добавляет только нового(insert)
+//		em.merge(publisher);//работает как obsert если нет добавляет, если есть заменяет
 		return publisher;
 	}
 
