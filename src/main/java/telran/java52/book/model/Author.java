@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
@@ -26,7 +27,8 @@ public class Author implements Serializable{
 	@Id
 	String name;
     LocalDate birthDate;
-    @ManyToMany(mappedBy = "authors")//всегда ставится на строне родительской сущьности
+    @ManyToMany(mappedBy = "authors", cascade = CascadeType.REMOVE)//всегда ставится на строне родительской сущьности
+   //cascade = CascadeType.REMOVE haibernet выполняет код удаления по автору
     Set<Book> books;
 	
     public Author(String name, LocalDate birthDate) {
