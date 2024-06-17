@@ -23,25 +23,29 @@ public class PublisherRepositoryImpl implements PublisherRepository {
 	
 	@Override//don`t work
 	public List<String> findPublishersByAuthor(String authorName) {
-		TypedQuery<Book> query = em.createQuery(
-		        "SELECT b FROM Book b JOIN b.authors a WHERE a.name = :authorName", Book.class);
-		    query.setParameter("authorName", authorName);
-		   
-		    return 
-		    		query.getResultStream()
-		        .map(book -> book.getPublisher().getPublisherName())
-		        .distinct()
-		        .collect(Collectors.toList());
-
+		TypedQuery<String> query = em.createQuery("select distinct p.publisherName from Book b join b.publisher p join b.authors a where a.name=?1",String.class);
+		query.setParameter(1, authorName);
+		return query.getResultList();
 	}
+//		TypedQuery<Book> query = em.createQuery(
+//		        "SELECT b FROM Book b JOIN b.authors a WHERE a.name = :authorName", Book.class);
+//		    query.setParameter("authorName", authorName);
+//		   
+//		    return 
+//		    		query.getResultStream()
+//		        .map(book -> book.getPublisher().getPublisherName())
+//		        .distinct()
+//		        .collect(Collectors.toList());
+
+	
 
 	@Override
 	public Stream<Publisher> findDistinctByBooksAuthorsName(String authorName) {
 		TypedQuery<Publisher> query = em.createQuery(
-                "SELECT DISTINCT b.publisher FROM Book b WHERE b.author.name = :authorName", Publisher.class);
-        query.setParameter("authorName", authorName);
-        List<Publisher> publishers = query.getResultList();
-        return publishers.stream();
+                "select distinct p from Book b join b.publisher p join b.authors a where a.name = ?1", Publisher.class);
+        query.setParameter(1, authorName);
+       
+        return query.getResultStream();
 	}
 
 	@Override

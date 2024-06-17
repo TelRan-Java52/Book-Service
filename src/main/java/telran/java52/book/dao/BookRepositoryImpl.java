@@ -24,6 +24,7 @@ public class BookRepositoryImpl implements BookRepository {
 		  query.setParameter("authorName", name);
 		    List<Book> books = query.getResultList();
 		    return books.stream();
+	// return em.createQuery("select b from Book b join b. authors a where a.name=?1",Book.class);
 	}
 
 	@Override
@@ -69,6 +70,7 @@ public class BookRepositoryImpl implements BookRepository {
 
 	@Override
 	public void deleteById(String isbn) {
+		// em.remove(em.find(Book.class, isbn));
 		Book book = em.find(Book.class, isbn);
 		if (book !=null) {
 			em.remove(book);
